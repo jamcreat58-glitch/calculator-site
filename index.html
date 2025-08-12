@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Advanced Scientific Calculator</title>
+<style>
+    body {
+        background:#ffffff; /* Changed to white */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+    }
+    .calculator {
+        background: #1e272e;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        width: 350px;
+        display: flex;
+        flex-direction: column;
+    }
+    .display {
+        background: #2f3640;
+        color: #fff;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+        text-align: right;
+    }
+    .expression {
+        font-size: 1rem;
+        color: #ccc;
+        min-height: 20px;
+    }
+    .result {
+        font-size: 1.8rem;
+        font-weight: bold;
+        min-height: 30px;
+    }
+    .buttons {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 8px;
+    }
+    button {
+        height: 50px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 8px;
+        background: #34495e;
+        color: #fff;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    button:hover { background: #3d566e; }
+    .operator { background: #e67e22; }
+    .operator:hover { background: #d35400; }
+    .equals { background: #27ae60; grid-column: span 2; }
+    .equals:hover { background: #1e8449; }
+    .clear { background: #c0392b; }
+    .clear:hover { background: #922b21; }
+    .memory { background: #8e44ad; }
+    .memory:hover { background: #6c3483; }
+    @media (max-width: 500px) {
+        .buttons { grid-template-columns: repeat(4, 1fr); }
+    }
+</style>
+</head>
+<body>
+
+<div class="calculator">
+    <div class="display">
+        <div class="expression" id="expression"></div>
+        <div class="result" id="result">0</div>
+    </div>
+    <div class="buttons">
+        <button class="memory" onclick="memoryClear()">MC</button>
+        <button class="memory" onclick="memoryRecall()">MR</button>
+        <button class="memory" onclick="memoryAdd()">M+</button>
+        <button class="memory" onclick="memorySubtract()">M-</button>
+        <button class="clear" onclick="clearAll()">AC</button>
+        <button onclick="deleteLast()">⌫</button>
+
+        <button onclick="appendFunc('sin(')">sin</button>
+        <button onclick="appendFunc('cos(')">cos</button>
+        <button onclick="appendFunc('tan(')">tan</button>
+        <button onclick="appendFunc('log(')">log</button>
+        <button onclick="appendFunc('ln(')">ln</button>
+        <button class="operator" onclick="appendValue('/')">÷</button>
+
+        <button onclick="appendValue('7')">7</button>
+        <button onclick="appendValue('8')">8</button>
+        <button onclick="appendValue('9')">9</button>
+        <button onclick="appendFunc('sqrt(')">√</button>
+        <button onclick="appendFunc('^2')">x²</button>
+        <button class="operator" onclick="appendValue('*')">×</button>
+
+        <button onclick="appendValue('4')">4</button>
+        <button onclick="appendValue('5')">5</button>
+        <button onclick="appendValue('6')">6</button>
+        <button onclick="appendFunc('^')">^</button>
+        <button onclick="appendConst('Math.PI')">π</button>
+        <button class="operator" onclick="appendValue('-')">−</button>
+
+        <button onclick="appendValue('1')">1</button>
+        <button onclick="appendValue('2')">2</button>
+        <button onclick="appendValue('3')">3</button>
+        <button onclick="appendConst('Math.E')">e</button>
+        <button class="equals" onclick="calculate()">=</button>
+        <button class="operator" onclick="appendValue('+')">+</button>
+
+        <button onclick="appendValue('0')">0</button>
+        <button onclick="appendValue('.')">.</button>
+        <button onclick="appendValue('(')">(</button>
+        <button onclick="appendValue(')')">)</button>
+        <button onclick="appendValue('%')">%</button>
+    </div>
+</div>
+
+<script>
+    let exprDisplay = document.getElementById('expression');
+    let resultDisplay = document.getElementById('result');
+    let memory = 0;
+
+    function appendValue(val) {
+        exprDisplay.textContent += val;
+        livePreview();
+    }
+    function appendFunc(func) {
+        exprDisplay.textContent += func;
+        livePreview();
+    }
+    function appendConst(constant) {
+        exprDisplay.textContent += constant;
+        livePreview();
+    }
+    function clearAll() {
+        exprDisplay.textContent = '';
+        resultDisplay.textContent = '0';
+    }
+    function deleteLast() {
+        exprDisplay.textContent = exprDisplay.textContent.slice(0, -1);
+        livePreview();
+    }
+    function calculate() {
+        try {
+            let exp = exprDisplay.textContent
+                .replace(/sin\(/g, 'Math.sin(')
+                .replace(/cos\(/g, 'Math.cos(')
+                .replace(/tan\(/g, 'Math.tan(')
+                .replace(/log\(/g, 'Math.log10(')
+                .replace(/ln\(/g, 'Math.log(')
+                .replace(/sqrt\(/g, 'Math.sqrt(')
+                .replace(/\^/g, '**');
+            let result = eval(exp);
+            resultDisplay.textContent = result;
+        } catch {
+            resultDisplay.textContent = 'Error';
+        }
+    }
+    function livePreview() {
+        try {
+            let exp = exprDisplay.textContent
+                .replace(/sin\(/g, 'Math.sin(')
+                .replace(/cos\(/g, 'Math.cos(')
+                .replace(/tan\(/g, 'Math.tan(')
+                .replace(/log\(/g, 'Math.log10(')
+                .replace(/ln\(/g, 'Math.log(')
+                .replace(/sqrt\(/g, 'Math.sqrt(')
+                .replace(/\^/g, '**');
+            let result = eval(exp);
+            if (!isNaN(result)) resultDisplay.textContent = result;
+        } catch {
+            resultDisplay.textContent = '0';
+        }
+    }
+
+    /* Memory Functions */
+    function memoryClear() { memory = 0; }
+    function memoryRecall() { exprDisplay.textContent += memory; livePreview(); }
+    function memoryAdd() { memory += Number(resultDisplay.textContent) || 0; }
+    function memorySubtract() { memory -= Number(resultDisplay.textContent) || 0; }
+
+    /* Keyboard Support */
+    document.addEventListener('keydown', (e) => {
+        if (!isNaN(e.key) || ['+', '-', '*', '/', '.', '(', ')', '%'].includes(e.key)) {
+            appendValue(e.key);
+        } else if (e.key === 'Enter') {
+            calculate();
+        } else if (e.key === 'Backspace') {
+            deleteLast();
+        }
+    });
+</script>
+
+</body>
+</html>
+google-site-verification: google74b8113b7a6f1d00.html
